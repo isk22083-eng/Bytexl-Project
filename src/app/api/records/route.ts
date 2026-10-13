@@ -4,7 +4,10 @@ import type { ExtractionResult } from "@/lib/types";
 
 const DEMO_PATIENT_NAME = "Demo Patient";
 
-async function getOrCreateDemoPatient(abhaId?: string | null) {
+// Fallback only: used if a record is saved before the user has created a
+// profile on this browser (see src/lib/patient.ts). Real records should
+// always carry a patientId from the client's stored profile.
+async function getOrCreateDemoPatient() {
   const supabase = requireSupabase();
 
   const { data: existing, error: findError } = await supabase
@@ -19,7 +22,7 @@ async function getOrCreateDemoPatient(abhaId?: string | null) {
 
   const { data: created, error: createError } = await supabase
     .from("patients")
-    .insert({ full_name: DEMO_PATIENT_NAME, abha_id: abhaId ?? null })
+    .insert({ full_name: DEMO_PATIENT_NAME })
     .select("id")
     .single();
 
@@ -32,12 +35,12 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       extraction: ExtractionResult;
       fileUrl?: string | null;
-      abhaId?: string | null;
+      patientId?: string | null;
     };
-    const { extraction, fileUrl, abhaId } = body;
+    const { extraction, fileUrl, patientId: requestedPatientId } = body;
 
     const supabase = requireSupabase();
-    const patientId = await getOrCreateDemoPatient(abhaId);
+    const patientId = requestedPatientId || (await getOrCreateDemoPatient());
 
     const { data: record, error: recordError } = await supabase
       .from("health_records")
@@ -105,16 +108,23 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const supabase = requireSupabase();
+    const patientId = req.nextUrl.searchParams.get("patientId");
 
-    const { data, error } = await supabase
+    let query = supabase
       .from("health_records")
       .select(
-        "*, medications(*), lab_observations(*), diagnoses(*)",
+        "*, patients(full_name, date_of_birth, gender, abha_id), medications(*), lab_observations(*), diagnoses(*)",
       )
       .order("document_date", { ascending: false, nullsFirst: false });
+
+    if (patientId) {
+      query = query.eq("patient_id", patientId);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 

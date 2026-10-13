@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useLanguage } from "@/lib/i18n";
 import type { ExtractionResult } from "@/lib/types";
+import { usePatientId } from "@/lib/patient";
 
 export default function UploadPage() {
   const { lang, t } = useLanguage();
@@ -11,8 +13,10 @@ export default function UploadPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [savedRecordId, setSavedRecordId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ExtractionResult | null>(null);
+  const patientId = usePatientId();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,7 +56,7 @@ export default function UploadPage() {
       const res = await fetch("/api/records", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ extraction: result }),
+        body: JSON.stringify({ extraction: result, patientId }),
       });
       const data = await res.json();
 
@@ -61,6 +65,7 @@ export default function UploadPage() {
       }
 
       setSaved(true);
+      setSavedRecordId(data.id as string);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -71,6 +76,26 @@ export default function UploadPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="text-2xl font-bold">{t("navUpload")}</h1>
+
+      {!patientId && (
+        <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          {lang === "te" ? (
+            <>
+              రికార్డులను సేవ్ చేయడానికి ముందు దయచేసి మీ ప్రొఫైల్‌ను సెటప్ చేయండి.{" "}
+              <Link href="/profile?redirect=/upload" className="underline">
+                ఇక్కడ క్లిక్ చేయండి
+              </Link>
+            </>
+          ) : (
+            <>
+              Set up your profile before saving records so they&apos;re linked to you.{" "}
+              <Link href="/profile?redirect=/upload" className="underline">
+                Set up profile
+              </Link>
+            </>
+          )}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-xl border border-black/10 p-6 dark:border-white/10">
         <div>
@@ -187,18 +212,26 @@ export default function UploadPage() {
             </section>
           )}
 
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving || saved}
-            className="rounded-full border border-black/20 px-6 py-2.5 text-sm font-medium hover:bg-black/5 disabled:opacity-50 dark:border-white/20 dark:hover:bg-white/10"
-          >
-            {saved
-              ? lang === "te" ? "టైమ్‌లైన్‌కు సేవ్ చేయబడింది" : "Saved to timeline"
-              : saving
-                ? lang === "te" ? "సేవ్ చేస్తోంది..." : "Saving..."
-                : lang === "te" ? "టైమ్‌లైన్‌కు సేవ్ చేయండి" : "Save to timeline"}
-          </button>
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving || saved}
+              className="rounded-full border border-black/20 px-6 py-2.5 text-sm font-medium hover:bg-black/5 disabled:opacity-50 dark:border-white/20 dark:hover:bg-white/10"
+            >
+              {saved
+                ? lang === "te" ? "టైమ్‌లైన్‌కు సేవ్ చేయబడింది" : "Saved to timeline"
+                : saving
+                  ? lang === "te" ? "సేవ్ చేస్తోంది..." : "Saving..."
+                  : lang === "te" ? "టైమ్‌లైన్‌కు సేవ్ చేయండి" : "Save to timeline"}
+            </button>
+
+            {saved && savedRecordId && (
+              <Link href={`/record/${savedRecordId}`} className="text-sm underline">
+                {lang === "te" ? "రికార్డ్ చూడండి / ప్రింట్ చేయండి" : "View / Print this record"}
+              </Link>
+            )}
+          </div>
         </div>
       )}
     </div>

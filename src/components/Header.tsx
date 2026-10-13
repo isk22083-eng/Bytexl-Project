@@ -7,7 +7,7 @@ export default function Header() {
   const { t, lang, setLang } = useLanguage();
 
   return (
-    <header className="border-b border-black/10 dark:border-white/10">
+    <header className="border-b border-black/10 dark:border-white/10 print:hidden">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <Link href="/" className="text-lg font-semibold">
           {t("appName")}
@@ -21,6 +21,9 @@ export default function Header() {
           </Link>
           <Link href="/timeline" className="hover:underline">
             {t("navTimeline")}
+          </Link>
+          <Link href="/profile" className="hover:underline">
+            {t("navProfile")}
           </Link>
           <button
             type="button"

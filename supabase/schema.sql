@@ -12,8 +12,13 @@ create table if not exists patients (
                                  -- integration would verify this against the
                                  -- ABDM sandbox instead of storing it as free text
   date_of_birth date,
+  gender text,
   created_at timestamptz not null default now()
 );
+
+-- Safe to re-run against an already-created database: adds the column
+-- without touching existing rows if it's missing, no-ops if it's already there.
+alter table patients add column if not exists gender text;
 
 create table if not exists health_records (
   id uuid primary key default gen_random_uuid(),

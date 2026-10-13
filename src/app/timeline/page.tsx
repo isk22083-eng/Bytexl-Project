@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useLanguage } from "@/lib/i18n";
+import { getStoredPatientId } from "@/lib/patient";
 
 type StoredRecord = {
   id: string;
@@ -27,7 +29,10 @@ export default function TimelinePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/records")
+    const patientId = getStoredPatientId();
+    const url = patientId ? `/api/records?patientId=${patientId}` : "/api/records";
+
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
@@ -88,6 +93,10 @@ export default function TimelinePage() {
                   r.medications.map((m) => m.name).join(", ")}
               </p>
             )}
+
+            <Link href={`/record/${r.id}`} className="mt-3 inline-block text-xs underline">
+              {lang === "te" ? "రికార్డ్ చూడండి / ప్రింట్ చేయండి" : "View / Print this record"}
+            </Link>
           </div>
         ))}
       </div>
