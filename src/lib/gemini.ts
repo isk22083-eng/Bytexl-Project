@@ -1,7 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 import type { ExtractionResult } from "./types";
 
-const MODEL = "gemini-2.0-flash";
+// gemini-3.8-flash (the default "thinking" model for this account) took
+// ~90s per extraction during testing — too slow for a live demo. Using the
+// lite variant instead: no hidden thinking tokens, ~5s responses, still
+// multimodal, and available on the free tier for this key.
+const MODEL = "gemini-3.1-flash-lite";
 
 const EXTRACTION_PROMPT = `You are a careful medical-document reading assistant. You are given an image of a medical document (prescription, lab report, or discharge summary), possibly handwritten and possibly in a mix of English and Telugu.
 
