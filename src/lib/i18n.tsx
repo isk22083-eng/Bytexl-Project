@@ -12,6 +12,8 @@ const dictionary = {
     navUpload: "Upload Record",
     navTimeline: "My Timeline",
     navProfile: "Profile",
+    navLogin: "Log In",
+    navLogout: "Log Out",
     heroTitle: "Your health records, finally easy to understand.",
     heroBody:
       "Upload a prescription, lab report or discharge summary. Health Copilot reads it with AI, pulls out the medicines, test values and diagnoses, and explains it in plain language — in English or Telugu.",
@@ -37,6 +39,8 @@ const dictionary = {
     navUpload: "రికార్డ్ అప్‌లోడ్ చేయండి",
     navTimeline: "నా టైమ్‌లైన్",
     navProfile: "ప్రొఫైల్",
+    navLogin: "లాగిన్",
+    navLogout: "లాగ్ అవుట్",
     heroTitle: "మీ ఆరోగ్య రికార్డులు ఇప్పుడు సులభంగా అర్థమవుతాయి.",
     heroBody:
       "ప్రిస్క్రిప్షన్, ల్యాబ్ రిపోర్ట్ లేదా డిశ్చార్జ్ సమ్మరీని అప్‌లోడ్ చేయండి. హెల్త్ కోపైలట్ AI సహాయంతో దానిని చదివి, మందులు, పరీక్ష విలువలు మరియు రోగనిర్ధారణలను వెలికితీసి, ఆంగ్లంలో లేదా తెలుగులో సులభమైన భాషలో వివరిస్తుంది.",

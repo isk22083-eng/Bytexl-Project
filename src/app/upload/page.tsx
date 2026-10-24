@@ -98,8 +98,8 @@ export default function UploadPage() {
         {!patientId && (
           <div className="upload-profile-notice" role="status">
             <span className="notice-icon" aria-hidden="true">ⓘ</span>
-            <p>{isTelugu ? "రికార్డులను సేవ్ చేయడానికి ముందు మీ ప్రొఫైల్‌ను సెటప్ చేయండి." : "Set up your profile before saving records so they can be linked to you."}</p>
-            <Link href="/profile?redirect=/upload">{isTelugu ? "ప్రొఫైల్ సెటప్" : "Set up profile"} <span aria-hidden="true">→</span></Link>
+            <p>{isTelugu ? "రికార్డులను సేవ్ చేయడానికి ముందు లాగిన్ అవ్వండి." : "Log in before saving records so they can be linked to you."}</p>
+            <Link href="/login?redirect=/upload">{isTelugu ? "లాగిన్" : "Log in"} <span aria-hidden="true">→</span></Link>
           </div>
         )}
 

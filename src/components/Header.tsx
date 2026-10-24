@@ -1,10 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n";
+import { usePatientId, clearStoredPatientId } from "@/lib/patient";
+import { firebaseAuth } from "@/lib/firebase";
 
 export default function Header() {
   const { t, lang, setLang } = useLanguage();
+  const router = useRouter();
+  const patientId = usePatientId();
+
+  async function handleLogout() {
+    try {
+      await firebaseAuth.signOut();
+    } catch {
+      // ignore — clearing local state still logs the user out of the app
+    }
+    clearStoredPatientId();
+    router.push("/login");
+  }
 
   return (
     <header className="border-b border-black/10 dark:border-white/10 print:hidden">
@@ -25,6 +40,15 @@ export default function Header() {
           <Link href="/profile" className="hover:underline">
             {t("navProfile")}
           </Link>
+          {patientId ? (
+            <button type="button" onClick={handleLogout} className="hover:underline">
+              {t("navLogout")}
+            </button>
+          ) : (
+            <Link href="/login" className="hover:underline">
+              {t("navLogin")}
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => setLang(lang === "en" ? "te" : "en")}

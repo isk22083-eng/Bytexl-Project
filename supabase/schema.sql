@@ -20,6 +20,12 @@ create table if not exists patients (
 -- without touching existing rows if it's missing, no-ops if it's already there.
 alter table patients add column if not exists gender text;
 
+-- Verified phone number from Firebase Phone Auth (E.164, e.g. +919999999999).
+-- Nullable so older rows created before login existed stay valid; unique
+-- only when set, so multiple old null-phone rows don't collide.
+alter table patients add column if not exists phone text;
+create unique index if not exists patients_phone_key on patients (phone) where phone is not null;
+
 create table if not exists health_records (
   id uuid primary key default gen_random_uuid(),
   patient_id uuid not null references patients(id) on delete cascade,
