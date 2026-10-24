@@ -46,6 +46,12 @@ function LoginForm() {
       confirmationRef.current = confirmation;
       setStage("otp");
     } catch (err) {
+      // A failed attempt can leave the reCAPTCHA token in a used/invalid
+      // state. Clear it so the next attempt builds a fresh one instead of
+      // silently reusing a broken verifier (which surfaces as a confusing
+      // auth/invalid-app-credential error with no obvious cause).
+      recaptchaRef.current?.clear();
+      recaptchaRef.current = null;
       setError(err instanceof Error ? err.message : "Something went wrong sending the OTP.");
     } finally {
       setLoading(false);
