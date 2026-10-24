@@ -63,3 +63,12 @@ create table if not exists diagnoses (
 
 -- Demo-only: RLS left disabled so the hackathon anon key can read/write
 -- freely. Enable and write real policies before any non-demo use.
+
+-- Storage bucket for the original uploaded documents (prescriptions, lab
+-- reports, etc). Public so file_url can be used directly as an <img src>
+-- — fine for synthetic/demo documents; revisit before storing anything
+-- sensitive. The app also creates this automatically on first upload if
+-- it's missing, so running this is optional but keeps the schema self-documenting.
+insert into storage.buckets (id, name, public)
+values ('health-records', 'health-records', true)
+on conflict (id) do nothing;

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLanguage } from "@/lib/i18n";
 import type { ExtractionResult } from "@/lib/types";
 import { usePatientId } from "@/lib/patient";
+import TeluguAudioButton from "@/components/TeluguAudioButton";
 
 export default function UploadPage() {
   const { lang, t } = useLanguage();
@@ -16,6 +17,7 @@ export default function UploadPage() {
   const [savedRecordId, setSavedRecordId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ExtractionResult | null>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const patientId = usePatientId();
   const isTelugu = lang === "te";
@@ -26,6 +28,7 @@ export default function UploadPage() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setFileUrl(null);
     setSaved(false);
     try {
       const formData = new FormData();
@@ -35,6 +38,7 @@ export default function UploadPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Extraction failed.");
       setResult(data.extraction as ExtractionResult);
+      setFileUrl((data.fileUrl as string | null) ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -50,7 +54,7 @@ export default function UploadPage() {
       const res = await fetch("/api/records", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ extraction: result, patientId }),
+        body: JSON.stringify({ extraction: result, patientId, fileUrl }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Saving failed.");
@@ -73,6 +77,7 @@ export default function UploadPage() {
     setFile(nextFile);
     setError(null);
     setResult(null);
+    setFileUrl(null);
     setSaved(false);
   }
 
@@ -148,7 +153,7 @@ export default function UploadPage() {
 
         {result && <section className="results-stack" aria-live="polite">
           <div className="results-heading"><div><span className="step-label">{isTelugu ? "దశ 2" : "STEP 2"}</span><h2>{isTelugu ? "మీ సారాంశం సిద్ధంగా ఉంది" : "Your summary is ready"}</h2></div><span className="result-ready"><span aria-hidden="true">✓</span> {isTelugu ? "విశ్లేషణ పూర్తయింది" : "Analysis complete"}</span></div>
-          <section className="result-card"><h3><span className="result-icon" aria-hidden="true">✧</span>{isTelugu ? "ఆంగ్ల సారాంశం" : "Document summary"}</h3><p className="result-copy">{result.summaryEnglish}</p>{result.summaryTelugu && <><h3 className="telugu-summary-title">తెలుగు సారాంశం</h3><p className="result-copy">{result.summaryTelugu}</p></>}<p className="medical-disclaimer">{result.disclaimer}</p></section>
+          <section className="result-card"><h3><span className="result-icon" aria-hidden="true">✧</span>{isTelugu ? "ఆంగ్ల సారాంశం" : "Document summary"}</h3><p className="result-copy">{result.summaryEnglish}</p>{result.summaryTelugu && <><h3 className="telugu-summary-title">తెలుగు సారాంశం</h3><p className="result-copy">{result.summaryTelugu}</p><TeluguAudioButton text={result.summaryTelugu} /></>}<p className="medical-disclaimer">{result.disclaimer}</p></section>
           {result.medications.length > 0 && <section className="result-card"><h3><span className="result-icon" aria-hidden="true">＋</span>{isTelugu ? "మందులు" : "Medications"}</h3><ul className="result-list">{result.medications.map((m, i) => <li key={i}><strong>{m.name}</strong>{m.dosage && ` — ${m.dosage}`}{m.frequency && `, ${m.frequency}`}{m.duration && `, ${m.duration}`}{m.instructions && <p>{m.instructions}</p>}</li>)}</ul></section>}
           {result.labObservations.length > 0 && <section className="result-card"><h3><span className="result-icon" aria-hidden="true">⌁</span>{isTelugu ? "పరీక్ష ఫలితాలు" : "Lab observations"}</h3><ul className="result-list">{result.labObservations.map((o, i) => <li key={i}><strong className={o.isAbnormal ? "abnormal-value" : ""}>{o.testName}: {o.value} {o.unit}</strong>{o.referenceRange && <span> (ref: {o.referenceRange})</span>}{o.plainLanguageNote && <p>{o.plainLanguageNote}</p>}</li>)}</ul></section>}
           {result.diagnoses.length > 0 && <section className="result-card"><h3><span className="result-icon" aria-hidden="true">♡</span>{isTelugu ? "రోగనిర్ధారణలు" : "Diagnoses"}</h3><ul className="result-list">{result.diagnoses.map((d, i) => <li key={i}><strong>{d.description}</strong>{d.date && ` (${d.date})`}</li>)}</ul></section>}

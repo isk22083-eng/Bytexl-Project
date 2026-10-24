@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n";
+import TeluguAudioButton from "@/components/TeluguAudioButton";
 
 type RecordDetail = {
   id: string;
@@ -191,6 +192,9 @@ export default function RecordDetailClient({ id }: { id: string }) {
           <>
             <h3 className="mt-3 text-sm font-semibold">తెలుగు సారాంశం</h3>
             <p className="mt-1 text-sm">{record.summary_telugu}</p>
+            <div className="mt-3 print:hidden">
+              <TeluguAudioButton text={record.summary_telugu} />
+            </div>
           </>
         )}
       </section>

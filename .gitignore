@@ -37,6 +37,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# real patient documents used for local testing — never commit these.
+# only synthetic/sample files belong in the tracked `samples/` folder.
+/test-data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code session state (worktrees, etc.) — never project content
+/.claude/
