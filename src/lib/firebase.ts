@@ -14,3 +14,13 @@ const firebaseConfig = {
 
 export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const firebaseAuth = getAuth(firebaseApp);
+
+// Dev-only: mocks the reCAPTCHA check for phone numbers registered as
+// "testing" numbers in the Firebase console (Authentication > Sign-in
+// method > Phone > Phone numbers for testing). Real phone numbers still
+// go through full verification regardless of this flag — it only affects
+// numbers the project owner has explicitly whitelisted. Scoped to
+// development so the live/demo build always uses real verification.
+if (process.env.NODE_ENV === "development") {
+  firebaseAuth.settings.appVerificationDisabledForTesting = true;
+}
